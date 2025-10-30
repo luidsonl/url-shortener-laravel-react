@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Api;
 
 use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +10,7 @@ class HealthCheckTest extends TestCase
 {
     private const HEALTHCHECK_ENDPOINT = '/api/health';
 
-    public function test_if_healthcheck_returns_200_and_healthy_status()
+    public function test_that_healthcheck_returns_200_and_healthy_status()
     {
         $response = $this->get(self::HEALTHCHECK_ENDPOINT);
 
@@ -20,7 +20,7 @@ class HealthCheckTest extends TestCase
                 ]);
     }
 
-    public function test_if_healthcheck_returns_correct_json_structure()
+    public function test_that_healthcheck_returns_correct_json_structure()
     {
         $response = $this->get(self::HEALTHCHECK_ENDPOINT);
 
@@ -34,7 +34,7 @@ class HealthCheckTest extends TestCase
         ]);
     }
 
-    public function test_if_healthcheck_includes_environment_info()
+    public function test_that_healthcheck_includes_environment_info()
     {
         $response = $this->get(self::HEALTHCHECK_ENDPOINT);
 
@@ -43,7 +43,7 @@ class HealthCheckTest extends TestCase
         ]);
     }
 
-    public function test_if_healthcheck_returns_503_when_database_is_down()
+    public function test_that_healthcheck_returns_503_when_database_is_down()
     {
         DB::shouldReceive('connection->getPdo')
           ->andThrow(new \Exception('Database connection failed'));
