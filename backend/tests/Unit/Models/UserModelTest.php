@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\User;
+use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -53,7 +54,7 @@ class UserModelTest extends TestCase
         $this->assertInstanceOf(User::class, $user);
         $this->assertEquals('John Doe', $user->name);
         $this->assertEquals('john@example.com', $user->email);
-        $this->assertEquals('user', $user->role);
+        $this->assertEquals(UserRole::USER, $user->role);
         $this->assertFalse($user->isAdmin());
     }
 
@@ -64,7 +65,7 @@ class UserModelTest extends TestCase
             'email' => 'default@example.com',
         ]);
 
-        $this->assertEquals('user', $user->role);
+        $this->assertEquals(UserRole::USER, $user->role);
         $this->assertFalse($user->isAdmin());
     }
 
@@ -76,13 +77,13 @@ class UserModelTest extends TestCase
             'role' => 'admin',
         ]);
 
-        $this->assertEquals('admin', $admin->role);
+        $this->assertEquals(UserRole::ADMIN, $admin->role);
         $this->assertTrue($admin->isAdmin());
     }
 
     public function test_that_it_rejects_invalid_roles()
     {
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(\ValueError::class);
         
         User::factory()->create([
             'name' => 'Invalid User',
@@ -110,9 +111,8 @@ class UserModelTest extends TestCase
         $user = User::factory()->create(['role' => 'user']);
         $admin = User::factory()->create(['role' => 'admin']);
 
-        $this->assertEquals('user', $user->role);
-        $this->assertEquals('admin', $admin->role);
-
+        $this->assertEquals(UserRole::USER, $user->role);
+        $this->assertEquals(UserRole::ADMIN, $admin->role);
     }
 
     public function test_that_it_can_scope_users_by_role()
@@ -125,14 +125,14 @@ class UserModelTest extends TestCase
         if (method_exists(User::class, 'scopeAdmins')) {
             $admins = User::admins()->get();
             $this->assertCount(1, $admins);
-            $this->assertEquals('admin', $admins->first()->role);
+            $this->assertEquals(UserRole::ADMIN, $admins->first()->role);
             $this->assertTrue($admins->first()->isAdmin());
         }
 
         if (method_exists(User::class, 'scopeUsers')) {
             $users = User::users()->get();
             $this->assertCount(3, $users);
-            $this->assertTrue($users->every(fn($user) => $user->role === 'user'));
+            $this->assertTrue($users->every(fn($user) => $user->role === UserRole::USER));
             $this->assertTrue($users->every(fn($user) => !$user->isAdmin()));
         }
     }
@@ -188,7 +188,7 @@ class UserModelTest extends TestCase
 
         $this->assertInstanceOf(User::class, $foundUser);
         $this->assertEquals($user->id, $foundUser->id);
-        $this->assertEquals('user', $foundUser->role);
+        $this->assertEquals(UserRole::USER, $foundUser->role);
         $this->assertFalse($foundUser->isAdmin());
     }
 
@@ -198,8 +198,8 @@ class UserModelTest extends TestCase
         $user1 = User::factory()->create(['role' => 'user']);
         $user2 = User::factory()->create(['role' => 'user']);
 
-        $regularUsers = User::where('role', 'user')->get();
-        $adminUsers = User::where('role', 'admin')->get();
+        $regularUsers = User::where('role', UserRole::USER->value)->get();
+        $adminUsers = User::where('role', UserRole::ADMIN->value)->get();
 
         $this->assertCount(2, $regularUsers);
         $this->assertCount(1, $adminUsers);
