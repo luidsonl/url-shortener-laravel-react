@@ -16,8 +16,10 @@ erDiagram
     PLAN {
         int id PK
         string name
-        decimal price_month
-        decimal price_year
+        int price_monthly
+        int price_yearly
+        string description
+        bool is_active
     }
     
     USER_SUBSCRIPTION {
