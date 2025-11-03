@@ -90,7 +90,7 @@ class UserModelTest extends TestCase
         User::factory()->create([
             'name' => 'Invalid User',
             'email' => 'invalid@example.com',
-            'role' => 'invalid-role', // Isso deve lançar ValueError
+            'role' => 'invalid-role',
         ]);
     }
 

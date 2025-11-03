@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email');
-            $table->integer('price_monthly'); // Em centavos (ex: 1999 = R$ 19,99)
-            $table->integer('price_yearly');  // Em centavos (ex: 19999 = R$ 199,99)
+            $table->integer('price_monthly');
+            $table->integer('price_yearly');
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
