@@ -5,11 +5,11 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Plan;
-use App\Models\UserSubscription;
+use App\Models\Subscription;
 use App\Enums\SubscriptionStatus;
 use Carbon\Carbon;
 
-class UserSubscriptionSeeder extends Seeder
+class SubscriptionSeeder extends Seeder
 {
     public function run(): void
     {
@@ -24,7 +24,7 @@ class UserSubscriptionSeeder extends Seeder
         foreach ($users as $index => $user) {
             $plan = $plans[$index % $plans->count()];
 
-            UserSubscription::updateOrCreate(
+            Subscription::updateOrCreate(
                 [
                     'user_id' => $user->id,
                     'plan_id' => $plan->id,
@@ -40,7 +40,7 @@ class UserSubscriptionSeeder extends Seeder
         if ($admin) {
             $plan = $plans->first();
 
-            UserSubscription::updateOrCreate(
+            Subscription::updateOrCreate(
                 [
                     'user_id' => $admin->id,
                     'plan_id' => $plan->id,

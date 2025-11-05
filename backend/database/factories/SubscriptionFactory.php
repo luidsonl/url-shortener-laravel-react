@@ -5,17 +5,17 @@ namespace Database\Factories;
 use App\Enums\SubscriptionStatus;
 use App\Models\Plan;
 use App\Models\User;
-use App\Models\UserSubscription;
+use App\Models\Subscription;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class UserSubscriptionFactory extends Factory
+class SubscriptionFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = UserSubscription::class;
+    protected $model = Subscription::class;
 
     /**
      * Define the model's default state.

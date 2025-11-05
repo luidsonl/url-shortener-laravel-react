@@ -1,10 +1,10 @@
 ```mermaid
 erDiagram
-    USER ||--o{ USER_SUBSCRIPTION : has
+    USER ||--o{ SUBSCRIPTION : has
     USER ||--|| USER_CREDIT : has
     USER ||--o{ CREDIT_TRANSACTION : performs
-    PLAN ||--o{ USER_SUBSCRIPTION : defines
-    USER_SUBSCRIPTION ||--o{ SUBSCRIPTION_EVENT : generates
+    PLAN ||--o{ SUBSCRIPTION : defines
+    SUBSCRIPTION ||--o{ SUBSCRIPTION_EVENT : generates
     
     USER {
         int id PK
@@ -22,7 +22,7 @@ erDiagram
         bool is_active
     }
     
-    USER_SUBSCRIPTION {
+    SUBSCRIPTION {
         int id PK
         int user_id FK
         int plan_id FK
