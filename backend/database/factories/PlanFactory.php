@@ -18,7 +18,6 @@ class PlanFactory extends Factory
     {
         return [
             'name' => fake()->word(),
-            'email' => fake()->safeEmail(),
             'price_monthly' => fake()->numberBetween(1000, 10000),
             'price_yearly' => fake()->numberBetween(10000, 80000),
             'description' => fake()->sentence(),

@@ -17,7 +17,6 @@ class Plan extends Model
      */
     protected $fillable = [
         'name',
-        'email',
         'price_monthly',
         'price_yearly',
         'description',

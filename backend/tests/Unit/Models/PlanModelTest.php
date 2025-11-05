@@ -16,7 +16,6 @@ class PlanModelTest extends TestCase
 
         $this->assertInstanceOf(Plan::class, $plan);
         $this->assertNotEmpty($plan->name);
-        $this->assertNotEmpty($plan->email);
     }
 
     public function test_it_stores_prices_as_integers()
