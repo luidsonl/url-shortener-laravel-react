@@ -42,4 +42,9 @@ class Subscription extends Model
     {
         return $this->belongsTo(Plan::class);
     }
+
+    public function events()
+    {
+        return $this->hasMany(SubscriptionEvent::class);
+    }
 }
