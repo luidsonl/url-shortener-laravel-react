@@ -19,7 +19,6 @@ class UserModelTest extends TestCase
             'name',
             'email',
             'password',
-            'role',
         ], $user->getFillable());
     }
 
