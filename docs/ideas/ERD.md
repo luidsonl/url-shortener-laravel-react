@@ -33,7 +33,7 @@ erDiagram
     USER_CREDIT {
         int id PK
         int user_id FK
-        decimal balance
+        int balance
         string currency
     }
     
@@ -41,7 +41,7 @@ erDiagram
         int id PK
         int user_id FK
         string type
-        decimal amount
+        int amount
         string description
     }
     
@@ -49,6 +49,6 @@ erDiagram
         int id PK
         int subscription_id FK
         string event_type
-        decimal credit_applied
+        int credit_applied
     }
 ```
