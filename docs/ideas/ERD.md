@@ -2,7 +2,7 @@
 erDiagram
     USER ||--o{ SUBSCRIPTION : has
     USER ||--|| USER_CREDIT : has
-    USER ||--o{ CREDIT_TRANSACTION : performs
+    USER_CREDIT ||--o{ CREDIT_TRANSACTION : performs
     PLAN ||--o{ SUBSCRIPTION : defines
     SUBSCRIPTION ||--o{ SUBSCRIPTION_EVENT : generates
     
@@ -39,9 +39,10 @@ erDiagram
     
     CREDIT_TRANSACTION {
         int id PK
-        int user_id FK
+        int user_credit_id FK
         string type
         int amount
+        int balance_after
         string description
     }
     
