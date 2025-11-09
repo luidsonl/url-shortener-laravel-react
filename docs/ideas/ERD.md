@@ -1,10 +1,9 @@
 ```mermaid
 erDiagram
     USER ||--o{ SUBSCRIPTION : has
-    USER ||--|| USER_CREDIT : has
-    USER_CREDIT ||--o{ CREDIT_TRANSACTION : performs
     PLAN ||--o{ SUBSCRIPTION : defines
     SUBSCRIPTION ||--o{ SUBSCRIPTION_EVENT : generates
+    SUBSCRIPTION_EVENT ||--o| TRANSACTION : has
     
     USER {
         int id PK
@@ -30,26 +29,17 @@ erDiagram
         string status
     }
     
-    USER_CREDIT {
-        int id PK
-        int user_id FK
-        int balance
-        string currency
-    }
-    
-    CREDIT_TRANSACTION {
-        int id PK
-        int user_credit_id FK
-        string type
-        int amount
-        int balance_after
-        string description
-    }
-    
     SUBSCRIPTION_EVENT {
         int id PK
         int subscription_id FK
         string event_type
-        int credit_applied
+    }
+
+    TRANSACTION {
+        int id PK
+        int subscription_event_id FK
+        string type
+        int amount
+        string currency
     }
 ```
