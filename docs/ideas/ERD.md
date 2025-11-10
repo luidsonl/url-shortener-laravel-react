@@ -38,7 +38,6 @@ erDiagram
     TRANSACTION {
         int id PK
         int subscription_event_id FK
-        string type
         int amount
         string currency
     }
