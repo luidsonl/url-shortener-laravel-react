@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('subscription_id')->constrained('subscription_events')->onDelete('cascade');
+            $table->foreignId('subscription_event_id')->constrained('subscription_events')->onDelete('cascade');
+            $table->timestamp('processed_at');
             $table->integer('amount');
             $table->string('currency', 3)->default('BRL');
         });
