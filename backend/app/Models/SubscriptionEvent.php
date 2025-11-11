@@ -26,4 +26,9 @@ class SubscriptionEvent extends Model
     {
         return $this->belongsTo(Subscription::class);
     }
+    
+    public function transaction()
+    {
+        return $this->hasOne(Transaction::class);
+    }
 }
