@@ -39,8 +39,6 @@ class SubscriptionEventSeeder extends Seeder
             SubscriptionEventType::CREATED,
             SubscriptionEventType::RENEWED,
             SubscriptionEventType::EXPIRED,
-            SubscriptionEventType::PLAN_CHANGED,
-            SubscriptionEventType::CREDIT_APPLIED,
             SubscriptionEventType::CANCELLED,
         ];
 
