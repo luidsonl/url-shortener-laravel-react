@@ -14,7 +14,7 @@ class AuthSanctumTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        putenv('AUTH_DRIVER=sanctum');
+        config(['auth.guards.api.driver' => 'sanctum']);
     }
 
     public function test_that_health_check_returns_success()

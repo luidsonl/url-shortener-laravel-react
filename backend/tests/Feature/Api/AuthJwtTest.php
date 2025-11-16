@@ -14,7 +14,7 @@ class AuthJwtTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        putenv('AUTH_DRIVER=jwt');
+        config(['auth.guards.api.driver' => 'jwt']);
     }
 
     public function test_that_health_check_returns_success()
