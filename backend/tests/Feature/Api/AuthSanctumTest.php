@@ -7,9 +7,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class AuthTest extends TestCase
+class AuthSanctumTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        putenv('AUTH_DRIVER=sanctum');
+    }
 
     public function test_that_health_check_returns_success()
     {
