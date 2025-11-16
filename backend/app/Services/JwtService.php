@@ -41,7 +41,7 @@ class JwtService implements AuthServiceInterface
 
     public function logout()
     {
-        JWTAuth::invalidate();
+        JWTAuth::parseToken()->invalidate();
         return ['message' => 'Logout successful'];
     }
 
