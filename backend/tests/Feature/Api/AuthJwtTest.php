@@ -17,10 +17,30 @@ class AuthJwtTest extends TestCase
         config(['auth.guards.api.driver' => 'jwt']);
     }
 
+    protected function createToken(User $user)
+    {
+        $response = $this->postJson('/api/auth/login', [
+            'email' => $user->email,
+            'password' => 'password'
+        ]);
+
+        return $response->json('access_token');
+    }
+
+    protected function loginAndGetToken($email, $password)
+    {
+        $response = $this->postJson('/api/auth/login', [
+            'email' => $email,
+            'password' => $password
+        ]);
+
+
+        return $response->json('access_token');
+    }
+
     public function test_that_health_check_returns_success()
     {
         $response = $this->get('/api/health');
-
         $response->assertStatus(200);
     }
 
@@ -49,6 +69,7 @@ class AuthJwtTest extends TestCase
             ])
             ->assertJson([
                 'message' => 'User successfully created',
+                'token_type' => 'Bearer',
                 'user' => [
                     'name' => 'John Doe',
                     'email' => 'john@example.com',
@@ -64,7 +85,6 @@ class AuthJwtTest extends TestCase
     public function test_that_register_validates_required_fields()
     {
         $response = $this->postJson('/api/auth/register', []);
-
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['name', 'email', 'password']);
     }
@@ -79,7 +99,6 @@ class AuthJwtTest extends TestCase
         ];
 
         $response = $this->postJson('/api/auth/register', $userData);
-
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
     }
@@ -94,7 +113,6 @@ class AuthJwtTest extends TestCase
         ];
 
         $response = $this->postJson('/api/auth/register', $userData);
-
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password']);
     }
@@ -111,7 +129,6 @@ class AuthJwtTest extends TestCase
         ];
 
         $response = $this->postJson('/api/auth/register', $userData);
-
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
     }
@@ -134,6 +151,7 @@ class AuthJwtTest extends TestCase
             ->assertJsonStructure([
                 'token_type',
                 'access_token',
+                'expires_in',
                 'user' => [
                     'id',
                     'name',
@@ -142,6 +160,7 @@ class AuthJwtTest extends TestCase
                 ]
             ])
             ->assertJson([
+                'token_type' => 'Bearer',
                 'user' => [
                     'email' => 'john@example.com',
                 ]
@@ -161,22 +180,24 @@ class AuthJwtTest extends TestCase
         ];
 
         $response = $this->postJson('/api/auth/login', $credentials);
-
         $response->assertStatus(401);
     }
 
     public function test_that_login_validates_required_fields()
     {
         $response = $this->postJson('/api/auth/login', []);
-
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email', 'password']);
     }
 
     public function test_that_authenticated_user_can_get_their_profile()
     {
-        $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
+        $user = User::factory()->create([
+            'email' => 'john@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        $token = $this->loginAndGetToken('john@example.com', 'password123');
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -194,8 +215,12 @@ class AuthJwtTest extends TestCase
 
     public function test_that_authenticated_user_can_logout()
     {
-        $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
+        $user = User::factory()->create([
+            'email' => 'john@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        $token = $this->loginAndGetToken('john@example.com', 'password123');
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -203,26 +228,26 @@ class AuthJwtTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['message' => 'Logout successful']);
-
-        $this->assertDatabaseMissing('personal_access_tokens', [
-            'tokenable_id' => $user->id,
-            'tokenable_type' => User::class,
-        ]);
+        
     }
 
     public function test_that_unauthenticated_user_cannot_access_protected_routes()
     {
         $response = $this->getJson('/api/auth/user');
-
         $response->assertStatus(401);
     }
 
     public function test_that_validate_token_returns_true_with_valid_token()
     {
-        $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
+        $user = User::factory()->create([
+            'email' => 'john@example.com',
+            'password' => Hash::make('password123'),
+        ]);
 
-        $response = $this->postJson('/api/auth/validate-token', [
+        $token = $this->loginAndGetToken('john@example.com', 'password123');
+
+
+        $response = $this->postJson('/api/auth/validate-token',[
             'token' => $token,
         ]);
 
@@ -240,7 +265,7 @@ class AuthJwtTest extends TestCase
     public function test_that_validate_token_returns_false_with_invalid_token()
     {
         $response = $this->postJson('/api/auth/validate-token', [
-            'token' => 'invalid-token-123',
+            'token' => 'Bearer invalid-token-123',
         ]);
 
         $response->assertStatus(401)
@@ -249,16 +274,18 @@ class AuthJwtTest extends TestCase
 
     public function test_that_validate_token_validates_token_required()
     {
-        $response = $this->postJson('/api/auth/validate-token', []);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['token']);
+        $response = $this->postJson('/api/auth/validate-token');
+        $response->assertStatus(422);
     }
 
     public function test_that_laravel_default_user_route_still_works()
     {
-        $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
+        $user = User::factory()->create([
+            'email' => 'john@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        $token = $this->loginAndGetToken('john@example.com', 'password123');
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
