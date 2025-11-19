@@ -13,7 +13,7 @@ class UserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['auth.guards.api.driver' => 'jwt']);
+        config(['auth.guards.api.driver' => 'sanctum']);
     }
 
     protected function loginAndGetToken($email, $password = 'password')
