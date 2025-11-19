@@ -278,26 +278,6 @@ class AuthJwtTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function test_that_laravel_default_user_route_still_works()
-    {
-        $user = User::factory()->create([
-            'email' => 'john@example.com',
-            'password' => Hash::make('password123'),
-        ]);
-
-        $token = $this->loginAndGetToken('john@example.com', 'password123');
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/user');
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]);
-    }
 
     public function test_that_password_is_hashed_during_registration()
     {

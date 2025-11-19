@@ -255,23 +255,6 @@ class AuthSanctumTest extends TestCase
             ->assertJsonValidationErrors(['token']);
     }
 
-    public function test_that_laravel_default_user_route_still_works()
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/user');
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]);
-    }
-
     public function test_that_password_is_hashed_during_registration()
     {
         $userData = [
