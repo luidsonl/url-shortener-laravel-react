@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\AuthServiceInterface;
+use App\Mail\WelcomeEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -29,6 +31,8 @@ class AuthController extends Controller
         ]);
 
         $tokenData = $this->authService->createTokenForUser($user);
+
+        Mail::to($user->email)->send(new WelcomeEmail());
 
         return response()->json([
             'message' => 'User successfully created',
