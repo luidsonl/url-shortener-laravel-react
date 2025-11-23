@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use Tests\TestCase;
 
-class EmailTest extends TestCase
+class WelcomeEmailTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -26,6 +26,68 @@ class EmailTest extends TestCase
 
         return $response->json('access_token');
     }
+
+    public function test_that_welcome_email_is_sent_after_registration()
+    {
+        Mail::fake();
+
+        $userData = [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ];
+
+        $response = $this->postJson('/api/auth/register', $userData);
+
+        $response->assertStatus(201);
+
+        Mail::assertSent(WelcomeEmail::class, function ($mail) use ($userData) {
+            return $mail->hasTo($userData['email']);
+        });
+    }
+
+    public function test_that_welcome_email_has_correct_content_after_registration()
+    {
+        Mail::fake();
+
+        $userData = [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ];
+
+        $response = $this->postJson('/api/auth/register', $userData);
+
+        $response->assertStatus(201);
+
+        Mail::assertSent(WelcomeEmail::class, function ($mail) use ($userData) {
+            return $mail->hasTo($userData['email']) &&
+                $mail->user->name === $userData['name'] &&
+                $mail->user->email === $userData['email'];
+        });
+    }
+
+    public function test_that_no_email_is_sent_when_registration_fails()
+    {
+        Mail::fake();
+
+        $userData = [
+            'name' => 'John Doe',
+            'email' => 'invalid-email',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ];
+
+        $response = $this->postJson('/api/auth/register', $userData);
+
+        $response->assertStatus(422);
+
+        Mail::assertNotSent(WelcomeEmail::class);
+    }
+
+
 
     public function test_welcome_email_is_sent_when_user_is_created()
     {
@@ -80,7 +142,6 @@ class EmailTest extends TestCase
 
         $response->assertStatus(201);
 
-        // Verifica se o email contém as informações corretas do usuário
         Mail::assertSent(WelcomeEmail::class, function ($mail) use ($userData) {
             return $mail->hasTo($userData['email']) &&
                    $mail->user->name === $userData['name'] &&
