@@ -312,4 +312,75 @@ class AuthJwtTest extends TestCase
         $this->assertFalse($user->isAdmin());
         $this->assertTrue($user->isUser());
     }
+
+    public function test_that_user_cannot_register_with_admin_role()
+    {
+        $userData = [
+            'name' => 'Admin Wannabe',
+            'email' => 'adminwannabe@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'admin'
+        ];
+
+        $response = $this->postJson('/api/auth/register', $userData);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'adminwannabe@example.com',
+            'role' => 'user'
+        ]);
+
+        $response->assertJson([
+            'user' => [
+                'role' => 'user'
+            ]
+        ]);
+    }
+
+    public function test_that_user_cannot_register_with_any_custom_role()
+    {
+        $userData = [
+            'name' => 'Custom Role User',
+            'email' => 'customrole@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'moderator'
+        ];
+
+        $response = $this->postJson('/api/auth/register', $userData);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'customrole@example.com',
+            'role' => 'user'
+        ]);
+}
+
+    public function test_that_registered_user_has_default_user_role()
+    {
+        $userData = [
+            'name' => 'Default User',
+            'email' => 'default@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ];
+
+        $response = $this->postJson('/api/auth/register', $userData);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'default@example.com',
+            'role' => 'user'
+        ]);
+
+        $response->assertJson([
+            'user' => [
+                'role' => 'user'
+            ]
+        ]);
+    }
 }
