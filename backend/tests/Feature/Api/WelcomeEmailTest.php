@@ -43,6 +43,7 @@ class WelcomeEmailTest extends TestCase
         $response->assertStatus(201);
 
         Mail::assertSent(WelcomeEmail::class, function ($mail) use ($userData) {
+            
             return $mail->hasTo($userData['email']);
         });
     }
@@ -63,9 +64,9 @@ class WelcomeEmailTest extends TestCase
         $response->assertStatus(201);
 
         Mail::assertSent(WelcomeEmail::class, function ($mail) use ($userData) {
-            return $mail->hasTo($userData['email']) &&
-                $mail->user->name === $userData['name'] &&
-                $mail->user->email === $userData['email'];
+            return $mail->hasTo($userData['email'])
+                && str_contains( $mail->envelope()->subject, 'Welcome')
+                && str_contains($mail->render(), $userData['name']);
         });
     }
 

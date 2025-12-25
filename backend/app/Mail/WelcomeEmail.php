@@ -13,10 +13,11 @@ class WelcomeEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public readonly array $data)
     {
         //
     }
@@ -38,7 +39,7 @@ class WelcomeEmail extends Mailable
     {
         return new Content(
             view: 'mail.welcome-email',
-        );
+        )->with('user', $this->data['user']);
     }
 
     /**

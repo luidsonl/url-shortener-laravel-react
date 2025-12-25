@@ -32,7 +32,9 @@ class AuthController extends Controller
 
         $tokenData = $this->authService->createTokenForUser($user);
 
-        Mail::to($user->email)->send(new WelcomeEmail());
+        $emailData = ['user' => $user];
+
+        Mail::to($user->email)->send(new WelcomeEmail($emailData));
 
         return response()->json([
             'message' => 'User successfully created',
