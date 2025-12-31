@@ -74,9 +74,9 @@ class AuthController extends Controller
     public function validateToken(Request $request)
     {
         $request->validate(['token' => 'required|string']);
-        
+
         $user = $this->authService->validateToken($request->token);
-        
+
         if (!$user) {
             return response()->json(['valid' => false], 401);
         }

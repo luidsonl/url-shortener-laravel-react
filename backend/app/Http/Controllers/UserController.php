@@ -8,27 +8,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeEmail;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
         $query = User::query();
-        
+
         if ($request->has('role') && $request->role !== '') {
             $query->where('role', $request->role);
         }
-        
+
         if ($request->has('search') && $request->search !== '') {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
-        
+
         $users = $query->get();
-        
+
         return response()->json([
             'users' => $users
         ]);
@@ -50,6 +52,9 @@ class UserController extends Controller
             'role' => $validated['role']
         ]);
 
+        $emailData = ['user' => $user];
+        Mail::to($user->email)->send(new WelcomeEmail($emailData));
+
         return response()->json([
             'user' => $user
         ], 201);
@@ -61,11 +66,11 @@ class UserController extends Controller
 
         /** @var \App\Models\User|null $currentUser */
         $currentUser = auth()->guard()->user();
-        
+
         if (!$currentUser->isAdmin() && $currentUser->id != $id) {
             return response()->json(['message' => 'Unauthorized access'], 403);
         }
-        
+
         return response()->json([
             'user' => $user
         ]);
@@ -74,14 +79,14 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         $user = User::findOrFail($id);
-        
+
         /** @var \App\Models\User|null $currentUser */
         $currentUser = auth()->guard()->user();
-        
+
         if (!$currentUser->isAdmin() && $currentUser->id != $id) {
             return response()->json(['message' => 'Unauthorized access'], 403);
         }
-        
+
         $rules = [
             'name' => 'required|string|max:255',
             'email' => [
@@ -91,7 +96,7 @@ class UserController extends Controller
             ],
             'role' => ['required', new Enum(UserRole::class)]
         ];
-        
+
         if ($currentUser->isAdmin()) {
             $validated = $request->validate($rules);
         } else {
@@ -105,9 +110,9 @@ class UserController extends Controller
             ]);
             $validated['role'] = UserRole::USER->value;
         }
-        
+
         $user->update($validated);
-        
+
         return response()->json([
             'user' => $user->fresh()
         ]);
@@ -119,17 +124,17 @@ class UserController extends Controller
 
         /** @var \App\Models\User|null $currentUser */
         $currentUser = auth()->guard()->user();
-        
+
         if (!$currentUser->isAdmin()) {
             return response()->json(['message' => 'Unauthorized access'], 403);
         }
-        
+
         if ($currentUser->id == $id) {
             return response()->json(['message' => 'Cannot delete your own account'], 422);
         }
-        
+
         $user->delete();
-        
+
         return response()->json(['message' => 'User deleted successfully']);
     }
 }

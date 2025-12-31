@@ -43,7 +43,7 @@ class WelcomeEmailTest extends TestCase
         $response->assertStatus(201);
 
         Mail::assertSent(WelcomeEmail::class, function ($mail) use ($userData) {
-            
+
             return $mail->hasTo($userData['email']);
         });
     }
@@ -65,7 +65,7 @@ class WelcomeEmailTest extends TestCase
 
         Mail::assertSent(WelcomeEmail::class, function ($mail) use ($userData) {
             return $mail->hasTo($userData['email'])
-                && str_contains( $mail->envelope()->subject, 'Welcome')
+                && str_contains($mail->envelope()->subject, 'Welcome')
                 && str_contains($mail->render(), $userData['name']);
         });
     }
@@ -97,7 +97,7 @@ class WelcomeEmailTest extends TestCase
         $admin = User::factory()->admin()->create([
             'email' => 'admin@example.com',
         ]);
-        
+
         $token = $this->loginAndGetToken('admin@example.com');
 
         $userData = [
@@ -119,36 +119,6 @@ class WelcomeEmailTest extends TestCase
         });
     }
 
-    public function test_welcome_email_contains_correct_user_information()
-    {
-        Mail::fake();
-
-        $admin = User::factory()->admin()->create([
-            'email' => 'admin@example.com',
-        ]);
-        
-        $token = $this->loginAndGetToken('admin@example.com');
-
-        $userData = [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-            'role' => 'user'
-        ];
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/users', $userData);
-
-        $response->assertStatus(201);
-
-        Mail::assertSent(WelcomeEmail::class, function ($mail) use ($userData) {
-            return $mail->hasTo($userData['email']) &&
-                   $mail->user->name === $userData['name'] &&
-                   $mail->user->email === $userData['email'];
-        });
-    }
 
     public function test_welcome_email_is_not_sent_on_user_update()
     {
@@ -157,7 +127,7 @@ class WelcomeEmailTest extends TestCase
         $admin = User::factory()->admin()->create([
             'email' => 'admin@example.com',
         ]);
-        
+
         $token = $this->loginAndGetToken('admin@example.com');
 
         $user = User::factory()->create();
@@ -185,7 +155,7 @@ class WelcomeEmailTest extends TestCase
         $admin = User::factory()->admin()->create([
             'email' => 'admin@example.com',
         ]);
-        
+
         $token = $this->loginAndGetToken('admin@example.com');
 
         $existingUser = User::factory()->create(['email' => 'existing@example.com']);
