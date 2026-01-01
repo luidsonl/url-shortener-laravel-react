@@ -68,7 +68,7 @@ class AuthJwtTest extends TestCase
                 ]
             ])
             ->assertJson([
-                'message' => 'User successfully created',
+                'message' => 'User successfully created. Please check your email to verify your account.',
                 'token_type' => 'Bearer',
                 'user' => [
                     'name' => 'John Doe',
@@ -228,7 +228,6 @@ class AuthJwtTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['message' => 'Logout successful']);
-        
     }
 
     public function test_that_unauthenticated_user_cannot_access_protected_routes()
@@ -247,7 +246,7 @@ class AuthJwtTest extends TestCase
         $token = $this->loginAndGetToken('john@example.com', 'password123');
 
 
-        $response = $this->postJson('/api/auth/validate-token',[
+        $response = $this->postJson('/api/auth/validate-token', [
             'token' => $token,
         ]);
 
@@ -357,7 +356,7 @@ class AuthJwtTest extends TestCase
             'email' => 'customrole@example.com',
             'role' => 'user'
         ]);
-}
+    }
 
     public function test_that_registered_user_has_default_user_role()
     {

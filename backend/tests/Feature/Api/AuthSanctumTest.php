@@ -48,7 +48,7 @@ class AuthSanctumTest extends TestCase
                 ]
             ])
             ->assertJson([
-                'message' => 'User successfully created',
+                'message' => 'User successfully created. Please check your email to verify your account.',
                 'user' => [
                     'name' => 'John Doe',
                     'email' => 'john@example.com',

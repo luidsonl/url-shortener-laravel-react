@@ -32,12 +32,16 @@ class AuthController extends Controller
 
         $tokenData = $this->authService->createTokenForUser($user);
 
-        $emailData = ['user' => $user];
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())]
+        );
+        Mail::to($user)->send(new \App\Mail\VerifyEmail($url));
 
-        Mail::to($user->email)->send(new WelcomeEmail($emailData));
 
         return response()->json([
-            'message' => 'User successfully created',
+            'message' => 'User successfully created. Please check your email to verify your account.',
             ...$tokenData
         ], 201);
     }
@@ -50,6 +54,19 @@ class AuthController extends Controller
         ]);
 
         try {
+            $user = User::where('email', $request->email)->first();
+
+            // Note: In a real app we might want to check password first to avoid enumeration/spam, 
+            // but for simplicity and "immediately upon login" requirement:
+            if ($user && ! $user->hasVerifiedEmail()) {
+                $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                    'verification.verify',
+                    now()->addMinutes(60),
+                    ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())]
+                );
+                Mail::to($user)->send(new \App\Mail\VerifyEmail($url));
+            }
+
             $tokenData = $this->authService->login($request->only(['email', 'password']));
             return response()->json($tokenData);
         } catch (\Exception $e) {
