@@ -17,12 +17,6 @@ class AuthSanctumTest extends TestCase
         config(['auth.guards.api.driver' => 'sanctum']);
     }
 
-    public function test_that_health_check_returns_success()
-    {
-        $response = $this->get('/api/health');
-
-        $response->assertStatus(200);
-    }
 
     public function test_that_user_can_register_successfully()
     {

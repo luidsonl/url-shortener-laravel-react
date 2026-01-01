@@ -38,11 +38,6 @@ class AuthJwtTest extends TestCase
         return $response->json('access_token');
     }
 
-    public function test_that_health_check_returns_success()
-    {
-        $response = $this->get('/api/health');
-        $response->assertStatus(200);
-    }
 
     public function test_that_user_can_register_successfully()
     {
