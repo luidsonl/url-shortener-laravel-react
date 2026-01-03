@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Unit;
 
 use App\Enums\SubscriptionStatus;
 use App\Models\Plan;
