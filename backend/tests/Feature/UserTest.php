@@ -284,7 +284,7 @@ class UserTest extends TestCase
         $updateData = [
             'name' => 'Updated Name',
             'email' => 'user@example.com',
-            'role' => 'admin' // Tentando se promover a admin
+            'role' => 'admin' 
         ];
 
         $response = $this->withHeaders([
@@ -293,11 +293,10 @@ class UserTest extends TestCase
 
         $response->assertStatus(200);
 
-        // Verifica que o role não foi alterado apesar do usuário ter tentado
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'name' => 'Updated Name',
-            'role' => 'user' // Permanece como user
+            'role' => 'user'
         ]);
     }
 
@@ -469,7 +468,6 @@ class UserTest extends TestCase
         
         $token = $this->loginAndGetToken('admin@example.com');
 
-        // Create 2 regular users
         User::factory()->count(2)->create();
 
         $response = $this->withHeaders([
