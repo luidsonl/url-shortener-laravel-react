@@ -18,11 +18,11 @@ class ShortLinkFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(), // Cria um usuário automaticamente
+            'user_id' => User::factory(),
             'original_url' => $this->faker->url(),
-            'code' => null, // Será gerado automaticamente pelo modelo
+            'code' => null,
             'clicks' => $this->faker->numberBetween(0, 1000),
-            'expires_at' => $this->faker->optional(0.3, null) // 30% chance de ter expiração
+            'expires_at' => $this->faker->optional(0.3, null)
                 ->dateTimeBetween('+1 week', '+1 year'),
         ];
     }

@@ -58,4 +58,14 @@ class ShortLink extends Model
     {
         return self::where('code', $code)->first();
     }
+
+    public function isExpired(): bool
+    {
+        return $this->expires_at && $this->expires_at->isPast();
+    }
+
+    public function isValid(): bool
+    {
+        return !$this->isExpired();
+    }
 }
