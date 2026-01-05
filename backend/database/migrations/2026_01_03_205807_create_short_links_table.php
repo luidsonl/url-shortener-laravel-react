@@ -21,7 +21,7 @@ return new class extends Migration
             } else {
                 $table->string('code', 8)->unique()->nullable();
             }
-            $table->unsignedInteger('clicks')->default(0);
+            $table->unsignedBigInteger('clicks')->default(0);
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
 
