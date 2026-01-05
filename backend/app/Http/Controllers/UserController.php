@@ -54,7 +54,10 @@ class UserController extends Controller
         $emailData = ['user' => $user];
         Mail::to($user->email)->send(new WelcomeEmail($emailData));
 
-        return new UserResource($user);
+        return response()->json([
+            'message' => 'Short link created',
+            'data' => new UserResource($user)
+        ], 201);
     }
 
     public function show(string $id)
