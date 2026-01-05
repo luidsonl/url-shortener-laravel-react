@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
+use App\Http\Resources\UserResource;
 
 class UserController extends Controller
 {
@@ -29,11 +30,9 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->get();
-
-        return response()->json([
-            'users' => $users
-        ]);
+        $users = $query->paginate($request->per_page ?? 50);
+        
+        return UserResource::collection($users);
     }
 
     public function store(Request $request)
@@ -55,9 +54,7 @@ class UserController extends Controller
         $emailData = ['user' => $user];
         Mail::to($user->email)->send(new WelcomeEmail($emailData));
 
-        return response()->json([
-            'user' => $user
-        ], 201);
+        return new UserResource($user);
     }
 
     public function show(string $id)
@@ -71,9 +68,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Unauthorized access'], 403);
         }
 
-        return response()->json([
-            'user' => $user
-        ]);
+        return new UserResource($user);
     }
 
     public function update(Request $request, string $id)
@@ -113,9 +108,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return response()->json([
-            'user' => $user->fresh()
-        ]);
+        return new UserResource($user->fresh());
     }
 
     public function destroy(string $id)

@@ -43,7 +43,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'users' => [
+                'data' => [ // Mudou de 'users' para 'data'
                     '*' => [
                         'id',
                         'name',
@@ -52,11 +52,26 @@ class UserTest extends TestCase
                         'created_at',
                         'updated_at'
                     ]
+                ],
+                'links' => [
+                    'first',
+                    'last',
+                    'prev',
+                    'next'
+                ],
+                'meta' => [
+                    'current_page',
+                    'from',
+                    'last_page',
+                    'path',
+                    'per_page',
+                    'to',
+                    'total'
                 ]
             ]);
 
-        $users = $response->json('users');
-        $this->assertCount(4, $users); // 3 created + 1 admin
+        $data = $response->json('data');
+        $this->assertCount(4, $data); // 3 created + 1 admin
     }
 
     public function test_regular_user_cannot_list_users()
@@ -94,7 +109,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'user' => [
+                'data' => [ // Mudou de 'user' para 'data'
                     'id' => $user->id,
                     'name' => 'Test User',
                     'email' => 'test@example.com',
@@ -135,9 +150,9 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'user' => [
+                'data' => [ // Mudou de 'user' para 'data'
                     'id' => $user->id,
-                    'email' => 'user@example.com',
+                    'email' => $user->email,
                 ]
             ]);
     }
@@ -167,7 +182,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'user' => [
+                'data' => [ // Mudou de 'user' para 'data'
                     'id' => $user->id,
                     'name' => 'Updated Name',
                     'email' => 'updated@example.com',
@@ -204,7 +219,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'user' => [
+                'data' => [ // Mudou de 'user' para 'data'
                     'id' => $user->id,
                     'role' => 'admin'
                 ]
@@ -260,7 +275,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'user' => [
+                'data' => [ // Mudou de 'user' para 'data'
                     'id' => $user->id,
                     'name' => 'Updated Name',
                     'email' => 'user@example.com'
@@ -476,7 +491,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200);
 
-        $users = $response->json('users');
+        $users = $response->json('data'); // Mudou de 'users' para 'data'
         $this->assertCount(2, $users);
         
         foreach ($users as $user) {
@@ -501,7 +516,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200);
 
-        $users = $response->json('users');
+        $users = $response->json('data'); // Mudou de 'users' para 'data'
         $this->assertCount(1, $users);
         $this->assertEquals('John Doe', $users[0]['name']);
     }
@@ -528,7 +543,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'user' => [
+                'data' => [ // Mudou de 'user' para 'data'
                     'id',
                     'name',
                     'email',
@@ -536,7 +551,7 @@ class UserTest extends TestCase
                 ]
             ])
             ->assertJson([
-                'user' => [
+                'data' => [ // Mudou de 'user' para 'data'
                     'name' => 'New User',
                     'email' => 'newuser@example.com',
                     'role' => 'user'
