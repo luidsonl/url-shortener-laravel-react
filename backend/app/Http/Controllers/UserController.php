@@ -107,8 +107,11 @@ class UserController extends Controller
         }
 
         $user->update($validated);
-
-        return new UserResource($user);
+        
+        return response()->json([
+            'message' => 'User updated',
+            'data' => new UserResource($user)
+        ]);
     }
 
     public function destroy(string $id)

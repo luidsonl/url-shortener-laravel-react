@@ -43,7 +43,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'data' => [ // Mudou de 'users' para 'data'
+                'data' => [
                     '*' => [
                         'id',
                         'name',
@@ -109,7 +109,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [ // Mudou de 'user' para 'data'
+                'data' => [
                     'id' => $user->id,
                     'name' => 'Test User',
                     'email' => 'test@example.com',
@@ -150,7 +150,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [ // Mudou de 'user' para 'data'
+                'data' => [
                     'id' => $user->id,
                     'email' => $user->email,
                 ]
@@ -182,7 +182,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [ // Mudou de 'user' para 'data'
+                'data' => [
                     'id' => $user->id,
                     'name' => 'Updated Name',
                     'email' => 'updated@example.com',
@@ -219,7 +219,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [ // Mudou de 'user' para 'data'
+                'data' => [
                     'id' => $user->id,
                     'role' => 'admin'
                 ]
@@ -275,7 +275,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [ // Mudou de 'user' para 'data'
+                'data' => [
                     'id' => $user->id,
                     'name' => 'Updated Name',
                     'email' => 'user@example.com'
@@ -491,7 +491,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200);
 
-        $users = $response->json('data'); // Mudou de 'users' para 'data'
+        $users = $response->json('data');
         $this->assertCount(2, $users);
         
         foreach ($users as $user) {
@@ -516,7 +516,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(200);
 
-        $users = $response->json('data'); // Mudou de 'users' para 'data'
+        $users = $response->json('data');
         $this->assertCount(1, $users);
         $this->assertEquals('John Doe', $users[0]['name']);
     }
@@ -543,7 +543,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'data' => [ // Mudou de 'user' para 'data'
+                'data' => [
                     'id',
                     'name',
                     'email',
@@ -551,7 +551,7 @@ class UserTest extends TestCase
                 ]
             ])
             ->assertJson([
-                'data' => [ // Mudou de 'user' para 'data'
+                'data' => [
                     'name' => 'New User',
                     'email' => 'newuser@example.com',
                     'role' => 'user'
