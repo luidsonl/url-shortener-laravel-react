@@ -108,7 +108,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return new UserResource($user->fresh());
+        return new UserResource($user);
     }
 
     public function destroy(string $id)
