@@ -588,4 +588,181 @@ class UserTest extends TestCase
         $response->assertStatus(403)
             ->assertJson(['message' => 'Unauthorized access']);
     }
+    public function test_unverified_admin_cannot_access_admin_user_management_routes()
+{
+    $admin = User::factory()->admin()->create([
+        'email' => 'admin@example.com',
+        'email_verified_at' => null, 
+    ]);
+    
+    $token = $this->loginAndGetToken('admin@example.com');
+
+    
+    $user = User::factory()->create();
+
+      $routes = [
+        ['method' => 'GET', 'url' => '/api/users', 'name' => 'List users'],
+        ['method' => 'POST', 'url' => '/api/users', 'name' => 'Create user', 'data' => [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'user'
+        ]],
+        ['method' => 'GET', 'url' => "/api/users/{$user->id}", 'name' => 'Show other user'],
+        ['method' => 'PUT', 'url' => "/api/users/{$user->id}", 'name' => 'Update other user', 'data' => [
+            'name' => 'Updated',
+            'email' => 'updated@example.com',
+            'role' => 'user'
+        ]],
+        ['method' => 'DELETE', 'url' => "/api/users/{$user->id}", 'name' => 'Delete user'],
+    ];
+
+    foreach ($routes as $route) {
+        $method = $route['method'];
+        $url = $route['url'];
+        $routeName = $route['name'];
+        
+        if ($method === 'GET' || $method === 'DELETE') {
+            $response = $this->withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->json($method, $url);
+        } else {
+            $response = $this->withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->json($method, $url, $route['data']);
+        }
+
+        $this->assertThat(
+            $response->status(),
+            $this->equalTo(403),
+            "Route failed: {$routeName} ({$method} {$url}). Status received: {$response->status()}"
+        );
+        $response->assertStatus(403)
+            ->assertJson(['message' => 'Unauthorized access']);
+    }
+}
+
+public function test_unverified_regular_user_can_access_their_own_profile()
+{
+    $user = User::factory()->create([
+        'email' => 'user@example.com',
+        'email_verified_at' => null,
+    ]);
+    
+    $token = $this->loginAndGetToken('user@example.com');
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->getJson("/api/users/{$user->id}");
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'data' => [
+                'id' => $user->id,
+                'email' => $user->email,
+            ]
+        ]);
+
+    $updateData = [
+        'name' => 'Updated Name',
+        'email' => 'user@example.com',
+        'role' => 'user'
+    ];
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->putJson("/api/users/{$user->id}", $updateData);
+
+    $response->assertStatus(200);
+}
+
+public function test_unverified_regular_user_cannot_access_other_users()
+{
+    $user = User::factory()->create([
+        'email' => 'user@example.com',
+        'email_verified_at' => null,
+    ]);
+    
+    $token = $this->loginAndGetToken('user@example.com');
+
+    $otherUser = User::factory()->create();
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->getJson("/api/users/{$otherUser->id}");
+
+    $response->assertStatus(403)
+        ->assertJson(['message' => 'Unauthorized access']);
+
+    $updateData = [
+        'name' => 'Updated Name',
+        'email' => 'other@example.com',
+        'role' => 'user'
+    ];
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->putJson("/api/users/{$otherUser->id}", $updateData);
+
+    $response->assertStatus(403)
+        ->assertJson(['message' => 'Unauthorized access']);
+}
+
+public function test_unverified_user_cannot_access_admin_routes()
+{
+    $user = User::factory()->create([
+        'email' => 'user@example.com',
+        'email_verified_at' => null,
+    ]);
+    
+    $token = $this->loginAndGetToken('user@example.com');
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->getJson('/api/users');
+
+    $response->assertStatus(403)
+        ->assertJson(['message' => 'Unauthorized access']);
+
+    $userData = [
+        'name' => 'New User',
+        'email' => 'new@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        'role' => 'user'
+    ];
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->postJson('/api/users', $userData);
+
+    $response->assertStatus(403)
+        ->assertJson(['message' => 'Unauthorized access']);
+}
+
+public function test_verified_admin_can_access_all_routes()
+{
+
+    $admin = User::factory()->admin()->create([
+        'email' => 'admin@example.com',
+        'email_verified_at' => now(),
+    ]);
+    
+    $token = $this->loginAndGetToken('admin@example.com');
+
+    $user = User::factory()->create();
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->getJson('/api/users');
+
+    $response->assertStatus(200);
+
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->getJson("/api/users/{$user->id}");
+
+    $response->assertStatus(200);
+}
 }

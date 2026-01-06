@@ -54,6 +54,7 @@ class AuthController extends Controller
         ]);
 
         try {
+            /** @var \App\Models\User|null $user */
             $user = User::where('email', $request->email)->first();
 
             // Note: In a real app we might want to check password first to avoid enumeration/spam, 
