@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\VerificationController;
@@ -39,6 +40,13 @@ Route::middleware('auth:api')->group(function () {
             Route::delete('/users/{id}', [UserController::class, 'destroy']);
         });
     });
+    
+    Route::get('/profile', [ProfileController::class, 'show']);
+    
+    Route::middleware('hasVerifiedEmail')->group(function () {
+        Route::put('/profile', [ProfileController::class, 'update']);
+        Route::delete('/profile', [ProfileController::class, 'destroy']);
+    });
 
     // Authenticated user routes
     Route::prefix('auth')->group(function () {
@@ -46,7 +54,4 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
     });
 
-    // To get/update current user
-    Route::get('/users/{id}', [UserController::class, 'show']);
-    Route::put('/users/{id}', [UserController::class, 'update']);
 });
