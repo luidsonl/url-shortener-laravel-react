@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    use RefreshDatabase;
 
     public function show()
     {
