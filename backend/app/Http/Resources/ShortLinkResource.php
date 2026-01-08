@@ -15,6 +15,7 @@ class ShortLinkResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id'=> $this->id,
             'original_url' => $this->original_url,
             'code' => $this->code,
             'short_url_attribute' => $this->getShortUrlAttribute(),
