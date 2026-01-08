@@ -6,6 +6,7 @@ use App\Http\Resources\ShortLinkResource;
 use App\Models\ShortLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class ShortLinkController extends Controller
 {
@@ -105,7 +106,7 @@ class ShortLinkController extends Controller
 
         $shortLink->delete();
 
-        return response()->json(['message' => 'Short link deleted'], 204);
+        return response()->json(['message' => 'Short link deleted'], 200);
     }
 
     /**
@@ -113,19 +114,37 @@ class ShortLinkController extends Controller
      */
     public function redirect($code)
     {
-        $shortLink = ShortLink::findByCode($code);
-        
-        if (!$shortLink) {
+        $originalUrl = Cache::get("code:$code");
+
+        if (!$originalUrl){
+            $shortLink = ShortLink::findByCode($code);
+
+            if(!$shortLink){
+                Cache::put("code:$code", 'not_found', now()->addMinutes(10));
+                return response()->json(['message' => 'Link not found'], 404);
+            }
+
+            if ($shortLink->isExpired()){
+                Cache::put("code:$code", 'link_expired', now()->addMinutes(10));
+                return response()->json(['message' => 'Link expired'], 410);
+            }
+
+            if ($shortLink){
+                $originalUrl = $shortLink->original_url;
+                Cache::put("code:$code", $originalUrl, now()->addMinutes(10));
+                return redirect()->away($originalUrl);
+            }
+        }
+
+        if ($originalUrl === 'not_found'){
             return response()->json(['message' => 'Link not found'], 404);
         }
 
-        if ($shortLink->isExpired()) {
+        if ($originalUrl == 'link_expired'){
             return response()->json(['message' => 'Link expired'], 410);
         }
-
-        $shortLink->increment('clicks');
         
-        return redirect()->away($shortLink->original_url);
+        return redirect()->away($originalUrl);
     }
 
 
