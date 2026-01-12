@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\AuthServiceInterface;
+use App\Jobs\ProcessEmail;
+use App\Mail\VerifyEmail;
 use App\Mail\WelcomeEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -37,8 +39,10 @@ class AuthController extends Controller
             now()->addMinutes(60),
             ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())]
         );
-        Mail::to($user)->send(new \App\Mail\VerifyEmail($url));
 
+        $verifyEmail = new VerifyEmail($url);
+
+        ProcessEmail::dispatch($user, $verifyEmail);
 
         return response()->json([
             'message' => 'User successfully created. Please check your email to verify your account.',
@@ -65,7 +69,10 @@ class AuthController extends Controller
                     now()->addMinutes(60),
                     ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())]
                 );
-                Mail::to($user)->send(new \App\Mail\VerifyEmail($url));
+
+                $verifyEmail = new VerifyEmail($url);
+
+                ProcessEmail::dispatch($user, $verifyEmail);
             }
 
             $tokenData = $this->authService->login($request->only(['email', 'password']));

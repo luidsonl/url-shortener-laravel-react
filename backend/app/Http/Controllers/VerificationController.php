@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use App\Mail\VerifyEmail;
-use Illuminate\Support\Facades\Mail;
+use App\Jobs\ProcessEmail;
 use Illuminate\Support\Facades\URL;
 
 class VerificationController extends Controller
@@ -54,7 +54,8 @@ class VerificationController extends Controller
             ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())]
         );
 
-        Mail::to($user)->send(new VerifyEmail($url));
+        $verifyEmail = new VerifyEmail($url);
+        ProcessEmail::dispatch($user, $verifyEmail);
 
         return response()->json(['message' => 'Verification link sent'], 200);
     }

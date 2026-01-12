@@ -11,6 +11,7 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use App\Http\Resources\UserResource;
+use App\Jobs\ProcessEmail;
 
 class UserController extends Controller
 {
@@ -52,7 +53,9 @@ class UserController extends Controller
         ]);
 
         $emailData = ['user' => $user];
-        Mail::to($user->email)->send(new WelcomeEmail($emailData));
+        $welcomeEmail = new WelcomeEmail($emailData);
+
+        ProcessEmail::dispatch($user, $welcomeEmail);
 
         return response()->json([
             'message' => 'Short link created',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
@@ -32,7 +33,9 @@ class NewPasswordController extends Controller
 
         $frontendUrl = route('password.reset', ['token' => $token, 'email' => $request->email]);
 
-        Mail::to($user)->send(new ResetPasswordLink($frontendUrl));
+        $resetPasswordLink = new ResetPasswordLink($frontendUrl);
+
+        ProcessEmail::dispatch($user, $resetPasswordLink);
 
         return response()->json(['message' => 'If this email exists, a reset link has been sent.'], 200);
     }
