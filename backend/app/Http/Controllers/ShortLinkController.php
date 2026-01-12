@@ -215,17 +215,16 @@ class ShortLinkController extends Controller
         return redirect()->away($url);
     }
 
-    private function incrementClickCount(ShortLink $shortLink)
+    private function incrementClickCount(string $code)
     {
-        $cacheKey = "code:$shortLink->code:clicks";
-        $cachedCount = Cache::get($cacheKey);
+        $cacheKey = "code:$$code:clicks";
 
-        if ($cachedCount != null) {
-            Cache::increment("code:$shortLink->code:clicks");
+        if (Cache::has($cacheKey)) {
+            Cache::increment($cacheKey);
             return;
         }
         Cache::put($cacheKey, 1);
-        ProcessRedirectCount::dispatch($shortLink, $cacheKey);
+        ProcessRedirectCount::dispatch($code);
     }
 
 }

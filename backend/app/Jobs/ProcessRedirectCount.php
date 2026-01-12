@@ -15,8 +15,7 @@ class ProcessRedirectCount implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private ShortLink $shortLink,
-        private string $cacheKey
+        private string $code,
     )
     {
         $this->delay(now()->addMinutes(10));
@@ -27,10 +26,15 @@ class ProcessRedirectCount implements ShouldQueue
      */
     public function handle(): void
     {
-        $cachedCount = Cache::get($this->cacheKey);
+        $cacheKey = "code:$$this->code:clicks";
+        $cachedCount = Cache::get($cacheKey);
         if ($cachedCount !== null) {
-            $this->shortLink->increment('clicks', $cachedCount);
-            Cache::forget($this->cacheKey);
+            $shortLink = ShortLink::findByCode($this->code);
+            if (!$shortLink) {
+                return;
+            }
+            $shortLink->increment('clicks', $cachedCount);
+            Cache::forget($cacheKey);
         }
     }
 }
