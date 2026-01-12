@@ -158,7 +158,7 @@ class ShortLinkController extends Controller
                 return $this->cacheAndReturnExpired($code);
             }
 
-            ProcessRedirectCount::dispatch($shortLink);
+            $this->incrementClickCount($shortLink);
             return $this->cacheAndRedirect($code, $shortLink->original_url);
             
         } catch (\Exception $e) {
@@ -213,6 +213,19 @@ class ShortLinkController extends Controller
 
         Cache::put("code:$code", $url, now()->addMinutes(10));
         return redirect()->away($url);
+    }
+
+    private function incrementClickCount(ShortLink $shortLink)
+    {
+        $cacheKey = "code:$shortLink->code:clicks";
+        $cachedCount = Cache::get($cacheKey);
+
+        if ($cachedCount != null) {
+            Cache::increment("code:$shortLink->code:clicks");
+            return;
+        }
+        Cache::put($cacheKey, 1);
+        ProcessRedirectCount::dispatch($shortLink, $cacheKey);
     }
 
 }

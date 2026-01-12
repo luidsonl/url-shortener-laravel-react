@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\ShortLink;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 
 class ProcessRedirectCount implements ShouldQueue
 {
@@ -15,6 +16,7 @@ class ProcessRedirectCount implements ShouldQueue
      */
     public function __construct(
         private ShortLink $shortLink,
+        private string $cacheKey
     )
     {
         $this->delay(now()->addMinutes(10));
@@ -25,6 +27,10 @@ class ProcessRedirectCount implements ShouldQueue
      */
     public function handle(): void
     {
-        //
+        $cachedCount = Cache::get($this->cacheKey);
+        if ($cachedCount !== null) {
+            $this->shortLink->increment('clicks', $cachedCount);
+            Cache::forget($this->cacheKey);
+        }
     }
 }
