@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ShortLinkResource;
+use App\Jobs\ProcessRedirectCount;
 use App\Models\ShortLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class ShortLinkController extends Controller
 {
@@ -110,45 +112,6 @@ class ShortLinkController extends Controller
     }
 
     /**
-     * Redirect to original URL
-     */
-    public function redirect($code)
-    {
-        $originalUrl = Cache::get("code:$code");
-
-        if (!$originalUrl){
-            $shortLink = ShortLink::findByCode($code);
-
-            if(!$shortLink){
-                Cache::put("code:$code", 'not_found', now()->addMinutes(10));
-                return response()->json(['message' => 'Link not found'], 404);
-            }
-
-            if ($shortLink->isExpired()){
-                Cache::put("code:$code", 'link_expired', now()->addMinutes(10));
-                return response()->json(['message' => 'Link expired'], 410);
-            }
-
-            if ($shortLink){
-                $originalUrl = $shortLink->original_url;
-                Cache::put("code:$code", $originalUrl, now()->addMinutes(10));
-                return redirect()->away($originalUrl);
-            }
-        }
-
-        if ($originalUrl === 'not_found'){
-            return response()->json(['message' => 'Link not found'], 404);
-        }
-
-        if ($originalUrl == 'link_expired'){
-            return response()->json(['message' => 'Link expired'], 410);
-        }
-        
-        return redirect()->away($originalUrl);
-    }
-
-
-    /**
      * Bulk delete links
      */
     public function bulkDestroy(Request $request)
@@ -172,4 +135,84 @@ class ShortLinkController extends Controller
             'message' => "{$deleted} links deleted"
         ]);
     }
+
+    /**
+     * Redirect to original URL
+     */
+    public function redirect($code)
+    {
+        $cachedResult = Cache::get("code:$code");
+        
+        if ($cachedResult !== null) {
+            return $this->handleCachedResult($cachedResult);
+        }
+        
+        try {
+            $shortLink = ShortLink::findByCode($code);
+            
+            if (!$shortLink) {
+                return $this->cacheAndReturnNotFound($code);
+            }
+            
+            if ($shortLink->isExpired()) {
+                return $this->cacheAndReturnExpired($code);
+            }
+
+            ProcessRedirectCount::dispatch($shortLink);
+            return $this->cacheAndRedirect($code, $shortLink->original_url);
+            
+        } catch (\Exception $e) {
+            Log::error('Error processing redirect', [
+                'code' => $code,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json(['message' => 'Internal error'], 500);
+        }
+    }
+
+    /**
+     * Process cached result
+     */
+    private function handleCachedResult($cachedResult)
+    {
+        if ($cachedResult === 'not_found') {
+            return response()->json(['message' => 'Link not found'], 404);
+        }
+        
+        if ($cachedResult === 'link_expired') {
+            return response()->json(['message' => 'Link expired'], 410);
+        }
+        
+        return redirect()->away($cachedResult);
+    }
+
+    /**
+     * Cache and return 404 error
+     */
+    private function cacheAndReturnNotFound($code)
+    {
+        Cache::put("code:$code", 'not_found', now()->addMinutes(10));
+        return response()->json(['message' => 'Link not found'], 404);
+    }
+
+    /**
+     * Cache and return 410 error
+     */
+    private function cacheAndReturnExpired($code)
+    {
+        Cache::put("code:$code", 'link_expired', now()->addMinutes(10));
+        return response()->json(['message' => 'Link expired'], 410);
+    }
+
+    /**
+     * Cache and redirect
+     */
+    private function cacheAndRedirect($code, $url)
+    {
+
+        Cache::put("code:$code", $url, now()->addMinutes(10));
+        return redirect()->away($url);
+    }
+
 }
