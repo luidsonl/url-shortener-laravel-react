@@ -18,7 +18,7 @@ class ProcessRedirectCount implements ShouldQueue
         private string $code,
     )
     {
-        $this->delay(now()->addMinutes(10));
+        $this->delay(now()->addMinutes(config('cache.cache_ttl.short_links')));
     }
 
     /**
@@ -26,15 +26,15 @@ class ProcessRedirectCount implements ShouldQueue
      */
     public function handle(): void
     {
-        $cacheKey = "code:$$this->code:clicks";
-        $cachedCount = Cache::get($cacheKey);
+        $clicksCacheKey = "code:$this->code:clicks";
+        $cachedCount = Cache::get($clicksCacheKey);
         if ($cachedCount !== null) {
             $shortLink = ShortLink::findByCode($this->code);
             if (!$shortLink) {
                 return;
             }
             $shortLink->increment('clicks', $cachedCount);
-            Cache::forget($cacheKey);
+            Cache::forget($clicksCacheKey);
         }
     }
 }

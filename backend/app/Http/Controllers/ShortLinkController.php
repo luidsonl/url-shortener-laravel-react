@@ -144,6 +144,7 @@ class ShortLinkController extends Controller
         $cachedResult = Cache::get("code:$code");
         
         if ($cachedResult !== null) {
+            $this->incrementClickCount($code);
             return $this->handleCachedResult($cachedResult);
         }
         
@@ -184,6 +185,7 @@ class ShortLinkController extends Controller
             return response()->json(['message' => 'Link expired'], 410);
         }
         
+
         return redirect()->away($cachedResult);
     }
 
@@ -192,7 +194,7 @@ class ShortLinkController extends Controller
      */
     private function cacheAndReturnNotFound($code)
     {
-        Cache::put("code:$code", 'not_found', now()->addMinutes(10));
+        Cache::put("code:$code", 'not_found', now()->addSeconds(config('cache.cache_ttl.short_links')));
         return response()->json(['message' => 'Link not found'], 404);
     }
 
@@ -201,7 +203,7 @@ class ShortLinkController extends Controller
      */
     private function cacheAndReturnExpired($code)
     {
-        Cache::put("code:$code", 'link_expired', now()->addMinutes(10));
+        Cache::put("code:$code", 'link_expired', now()->addSeconds(config('cache.cache_ttl.short_links')));
         return response()->json(['message' => 'Link expired'], 410);
     }
 
@@ -211,19 +213,19 @@ class ShortLinkController extends Controller
     private function cacheAndRedirect($code, $url)
     {
 
-        Cache::put("code:$code", $url, now()->addMinutes(10));
+        Cache::put("code:$code", $url, now()->addSeconds(config('cache.cache_ttl.short_links')));
         return redirect()->away($url);
     }
 
     private function incrementClickCount(string $code)
     {
-        $cacheKey = "code:$$code:clicks";
+        $clicksCacheKey = "code:$code:clicks";
 
-        if (Cache::has($cacheKey)) {
-            Cache::increment($cacheKey);
+        if (Cache::has($clicksCacheKey)) {
+            Cache::increment($clicksCacheKey);
             return;
         }
-        Cache::put($cacheKey, 1);
+        Cache::put($clicksCacheKey, 1, now()->addSeconds(config('cache.cache_ttl.click_counts')));
         ProcessRedirectCount::dispatch($code);
     }
 

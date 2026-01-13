@@ -99,6 +99,11 @@ return [
             ],
         ],
 
+        'cache_ttl'=>[
+            'short_links' => (int)env('CACHE_TTL_SHORT_LINKS', 3600),
+            'click_counts' => (int)env('CACHE_TTL_CLICK_COUNTS', 7200),
+        ],
+
     ],
 
     /*
@@ -107,7 +112,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | When utilizing the APC, database, memcached, Redis, and DynamoDB cache
-    | stores, there might be other applications using the same cache. For
+    | stores, there might bet other applications using the same cache. For
     | that reason, you may prefix every cache key to avoid collisions.
     |
     */
