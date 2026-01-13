@@ -15,7 +15,7 @@ class ProcessRedirectCount implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private string $code,
+        public string $code,
     )
     {
         $this->delay(now()->addMinutes(config('cache.cache_ttl.short_links')));

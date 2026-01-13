@@ -144,7 +144,9 @@ class ShortLinkController extends Controller
         $cachedResult = Cache::get("code:$code");
         
         if ($cachedResult !== null) {
-            $this->incrementClickCount($code);
+            if ($cachedResult !== 'not_found' && $cachedResult !== 'link_expired') {
+                $this->incrementClickCount($code);
+            }
             return $this->handleCachedResult($cachedResult);
         }
         
@@ -159,7 +161,7 @@ class ShortLinkController extends Controller
                 return $this->cacheAndReturnExpired($code);
             }
 
-            $this->incrementClickCount($shortLink);
+            $this->incrementClickCount($shortLink->code);
             return $this->cacheAndRedirect($code, $shortLink->original_url);
             
         } catch (\Exception $e) {
