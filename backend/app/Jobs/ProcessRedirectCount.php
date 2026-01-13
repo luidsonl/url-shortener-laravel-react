@@ -18,7 +18,7 @@ class ProcessRedirectCount implements ShouldQueue
         public string $code,
     )
     {
-        $this->delay(now()->addMinutes(config('cache.cache_ttl.short_links')));
+        $this->delay(now()->addSeconds(config('cache.cache_ttl.short_links')));
     }
 
     /**

@@ -99,11 +99,11 @@ return [
             ],
         ],
 
-        'cache_ttl'=>[
-            'short_links' => (int)env('CACHE_TTL_SHORT_LINKS', 3600),
-            'click_counts' => (int)env('CACHE_TTL_CLICK_COUNTS', 7200),
-        ],
-
+    ],
+    /*ttl*/
+    'cache_ttl'=>[
+        'short_links' => (int)env('CACHE_TTL_SHORT_LINKS', 3600),
+        'click_counts' => (int)env('CACHE_TTL_CLICK_COUNTS', 7200),
     ],
 
     /*
