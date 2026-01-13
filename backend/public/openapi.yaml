@@ -4,10 +4,10 @@ info:
   description: API documentation for the URL Shortener service.
   version: 1.0.0
 servers:
-  - url: /api
+  - url: /
     description: Main API server
 paths:
-  /health:
+  /api/health:
     get:
       tags:
         - System
@@ -19,7 +19,7 @@ paths:
         '503':
           description: System is unhealthy
 
-  /auth/register:
+  /api/auth/register:
     post:
       tags:
         - Authentication
@@ -42,7 +42,7 @@ paths:
         '422':
           description: Validation error
 
-  /auth/login:
+  /api/auth/login:
     post:
       tags:
         - Authentication
@@ -63,7 +63,7 @@ paths:
         '401':
           description: Invalid credentials
 
-  /auth/validate-token:
+  /api/auth/validate-token:
     post:
       tags:
         - Authentication
@@ -83,7 +83,7 @@ paths:
         '401':
           description: Token is invalid
 
-  /auth/logout:
+  /api/auth/logout:
     post:
       tags:
         - Authentication
@@ -93,8 +93,10 @@ paths:
       responses:
         '200':
           description: Successfully logged out
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
 
-  /auth/user:
+  /api/auth/user:
     get:
       tags:
         - Authentication
@@ -104,8 +106,10 @@ paths:
       responses:
         '200':
           description: Current user data
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
 
-  /forgot-password:
+  /api/forgot-password:
     post:
       tags:
         - Authentication
@@ -123,7 +127,7 @@ paths:
         '200':
           description: Reset link sent (or email non-existent)
 
-  /reset-password:
+  /api/reset-password:
     post:
       tags:
         - Authentication
@@ -146,7 +150,7 @@ paths:
         '400':
           description: Invalid or expired token
 
-  /profile:
+  /api/profile:
     get:
       tags:
         - Profile
@@ -156,6 +160,8 @@ paths:
       responses:
         '200':
           description: Profile data
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
     put:
       tags:
         - Profile
@@ -175,6 +181,10 @@ paths:
       responses:
         '200':
           description: Profile updated
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '422':
+          description: Validation error or incorrect previous password
     delete:
       tags:
         - Profile
@@ -184,8 +194,10 @@ paths:
       responses:
         '200':
           description: Account deleted
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
 
-  /short-links:
+  /api/short-links:
     get:
       tags:
         - Short Links
@@ -199,6 +211,10 @@ paths:
       responses:
         '200':
           description: Paginated list of links
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Email not verified
     post:
       tags:
         - Short Links
@@ -218,12 +234,16 @@ paths:
       responses:
         '201':
           description: Link created
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Email not verified
         '422':
           description: Validation error
 
-  /short-links/{code}:
+  /api/short-links/{id}:
     parameters:
-      - name: code
+      - name: id
         in: path
         required: true
         schema: { type: string }
@@ -233,6 +253,15 @@ paths:
       summary: Get short link details
       security:
         - bearerAuth: []
+      responses:
+        '200':
+          description: Link details
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Unauthorized or email not verified
+        '404':
+          description: Link not found
     put:
       tags:
         - Short Links
@@ -247,14 +276,30 @@ paths:
               properties:
                 original_url: { type: string, format: url }
                 expires_at: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Link updated
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Unauthorized or email not verified
+        '422':
+          description: Validation error
     delete:
       tags:
         - Short Links
       summary: Delete short link
       security:
         - bearerAuth: []
+      responses:
+        '200':
+          description: Link deleted
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Unauthorized or email not verified
 
-  /short-links/bulk-delete:
+  /api/short-links/bulk-delete:
     post:
       tags:
         - Short Links
@@ -270,8 +315,17 @@ paths:
               required: [ids]
               properties:
                 ids: { type: array, items: { type: integer } }
+      responses:
+        '200':
+          description: Links deleted
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Email not verified
+        '422':
+          description: Validation error
 
-  /users:
+  /api/users:
     get:
       tags:
         - Admin
@@ -285,14 +339,28 @@ paths:
         - name: search
           in: query
           schema: { type: string }
+      responses:
+        '200':
+          description: User list
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Admin access required
     post:
       tags:
         - Admin
       summary: Create a user
       security:
         - bearerAuth: []
+      responses:
+        '201':
+          description: User created
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Admin access required
 
-  /users/{id}:
+  /api/users/{id}:
     parameters:
       - name: id
         in: path
@@ -304,18 +372,57 @@ paths:
       summary: Get user details
       security:
         - bearerAuth: []
+      responses:
+        '200':
+          description: User data
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Admin access required
     put:
       tags:
         - Admin
       summary: Update user
       security:
         - bearerAuth: []
+      responses:
+        '200':
+          description: User updated
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Admin access required
     delete:
       tags:
         - Admin
       summary: Delete user
       security:
         - bearerAuth: []
+      responses:
+        '200':
+          description: User deleted
+        '401':
+          description: Unauthorized - Bearer token missing or invalid
+        '403':
+          description: Forbidden - Admin access required
+
+  /{code}:
+    parameters:
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags:
+        - Public
+      summary: Redirect to original URL
+      responses:
+        '302':
+          description: Redirecting to original URL
+        '404':
+          description: Link not found
+        '410':
+          description: Link expired
 
 components:
   securitySchemes:
