@@ -5,7 +5,7 @@ use App\Http\Controllers\ShortLinkController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return '<h1>API is running</h1>';
+    return view('swagger');
 });
 
 Route::get('/reset-password', [NewPasswordController::class, 'resetPasswordForm'])
