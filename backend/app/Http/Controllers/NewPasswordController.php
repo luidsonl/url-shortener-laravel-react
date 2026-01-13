@@ -51,18 +51,27 @@ class NewPasswordController extends Controller
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
 
         if (!$record || !Hash::check($request->token, $record->token)) {
-            return response()->json(['message' => 'Invalid token'], 400);
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Invalid token'], 400);
+            }
+            return back()->withInput()->withErrors(['token' => 'Invalid or expired token.']);
         }
 
         if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-            return response()->json(['message' => 'Token expired'], 400);
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Token expired'], 400);
+            }
+            return back()->withInput()->withErrors(['token' => 'Token expired.']);
         }
 
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'User not found'], 404);
+            }
+            return back()->withInput()->withErrors(['email' => 'User not found.']);
         }
 
         $user->forceFill([
@@ -71,7 +80,11 @@ class NewPasswordController extends Controller
 
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
-        return response()->json(['message' => 'Password reset successfully'], 200);
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Password reset successfully'], 200);
+        }
+
+        return view('reset-password-success');
     }
 
     public function resetPasswordForm(Request $request)
