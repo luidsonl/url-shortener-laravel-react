@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import api from '../services/api';
 import { useAuth } from '../services/auth';
 
-const { resendVerification } = useAuth();
+const { state, logout, resendVerification } = useAuth();
 const user = ref<any>(null);
 const loading = ref(false);
 const resending = ref(false);
@@ -46,7 +46,9 @@ onMounted(fetchProfile);
         <h1>Perfil</h1>
       </div>
       <nav class="nav">
+        <router-link v-if="state.user?.role === 'admin'" to="/users" class="nav-link">Usuários</router-link>
         <router-link to="/short-links" class="nav-link">Meus Links</router-link>
+        <button @click="logout" class="btn ghost">Sair</button>
       </nav>
     </header>
 

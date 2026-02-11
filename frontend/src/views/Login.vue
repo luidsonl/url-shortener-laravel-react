@@ -34,7 +34,7 @@ const handleLogin = async () => {
       <p class="small" style="margin-bottom: 2rem;">Entre na sua conta para gerenciar seus links.</p>
 
       <form @submit.prevent="handleLogin" class="form">
-        <div v-if="error" style="color: #ff4d4d; margin-bottom: 1rem; font-size: 0.9rem;">
+        <div v-if="error" style="background: rgba(248, 113, 113, 0.1); border-left: 4px solid #f87171; padding: 0.75rem; margin-bottom: 1.5rem; border-radius: 0 4px 4px 0; color: #fca5a5; font-size: 0.875rem;">
           {{ error }}
         </div>
 

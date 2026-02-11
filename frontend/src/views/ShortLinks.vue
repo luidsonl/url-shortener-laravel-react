@@ -80,6 +80,7 @@ onMounted(fetchLinks);
         <h1>Meus Links</h1>
       </div>
       <nav class="nav">
+        <router-link v-if="state.user?.role === 'admin'" to="/users" class="nav-link">Usuários</router-link>
         <router-link to="/profile" class="nav-link">Perfil</router-link>
         <button @click="logout" class="btn ghost">Sair</button>
       </nav>

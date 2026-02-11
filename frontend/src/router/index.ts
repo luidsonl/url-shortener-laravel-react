@@ -3,6 +3,7 @@ import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import ShortLinks from '../views/ShortLinks.vue';
 import Profile from '../views/Profile.vue';
+import Users from '../views/Users.vue';
 import { useAuth } from '../services/auth';
 
 const routes: Array<RouteRecordRaw> = [
@@ -34,6 +35,12 @@ const routes: Array<RouteRecordRaw> = [
         component: Profile,
         meta: { requiresAuth: true },
     },
+    {
+        path: '/users',
+        name: 'Users',
+        component: Users,
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
 ];
 
 const router = createRouter({
@@ -53,6 +60,8 @@ router.beforeEach(async (to, _from, next) => {
     if (to.meta.requiresAuth && !isAuthenticated) {
         next({ name: 'Login' });
     } else if (to.meta.guest && isAuthenticated) {
+        next({ name: 'ShortLinks' });
+    } else if (to.meta.requiresAdmin && state.user?.role !== 'admin') {
         next({ name: 'ShortLinks' });
     } else {
         next();
