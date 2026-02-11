@@ -4,7 +4,7 @@ use App\Http\Controllers\NewPasswordController;
 use App\Http\Controllers\ShortLinkController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::get('/api/documentation', function () {
     return view('swagger');
 });
 

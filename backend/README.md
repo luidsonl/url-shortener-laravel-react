@@ -67,6 +67,7 @@ Robust link-shortening API built with Laravel 12, designed for high traffic usin
 ## Public
 -   `GET /{code}` - Redirect to the original URL.
 -   `GET /health` - Check system status.
+-   `GET /api/documentation` - Swagger.
 
 ## Authentication
 -   `POST /api/auth/register` - Register a new user.

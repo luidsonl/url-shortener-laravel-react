@@ -65,6 +65,14 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
     /**
+     * Check if user email is verified
+     */
+    public function isVerified(): bool
+    {
+        return $this->hasVerifiedEmail();
+    }
+
+    /**
      * Check if user is a regular user
      */
     public function isUser(): bool
