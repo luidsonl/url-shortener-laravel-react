@@ -17,6 +17,22 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     use HasFactory, Notifiable, HasApiTokens;
 
     /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            $mailer = config('mail.default');
+            $host = config('mail.mailers.smtp.host');
+
+            // If SMTP is not configured or specifically set to log, auto-verify the email
+            if ($mailer === 'log' || empty($host)) {
+                $user->email_verified_at = now();
+            }
+        });
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

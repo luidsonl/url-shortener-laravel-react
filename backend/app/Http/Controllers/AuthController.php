@@ -35,15 +35,17 @@ class AuthController extends Controller
 
         $tokenData = $this->authService->createTokenForUser($user);
 
-        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
-            'verification.verify',
-            now()->addMinutes(60),
-            ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())]
-        );
+        if (! $user->hasVerifiedEmail()) {
+            $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(60),
+                ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())]
+            );
 
-        $verifyEmail = new VerifyEmail($url);
+            $verifyEmail = new VerifyEmail($url);
 
-        ProcessEmail::dispatch($user, $verifyEmail);
+            ProcessEmail::dispatch($user, $verifyEmail);
+        }
 
         return response()->json([
             'message' => 'User successfully created. Please check your email to verify your account.',

@@ -32,7 +32,7 @@ class UserController extends Controller
         }
 
         $users = $query->paginate($request->per_page ?? 50);
-        
+
         return UserResource::collection($users);
     }
 
@@ -52,10 +52,12 @@ class UserController extends Controller
             'role' => $validated['role']
         ]);
 
-        $emailData = ['user' => $user];
-        $welcomeEmail = new WelcomeEmail($emailData);
+        if (! $user->hasVerifiedEmail()) {
+            $emailData = ['user' => $user];
+            $welcomeEmail = new WelcomeEmail($emailData);
 
-        ProcessEmail::dispatch($user, $welcomeEmail);
+            ProcessEmail::dispatch($user, $welcomeEmail);
+        }
 
         return response()->json([
             'message' => 'User created successfully',
@@ -113,7 +115,7 @@ class UserController extends Controller
         }
 
         $user->update($validated);
-        
+
         return response()->json([
             'message' => 'User updated',
             ...(new UserResource($user))->resolve()
