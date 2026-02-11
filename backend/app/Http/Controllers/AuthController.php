@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\AuthServiceInterface;
+use App\Http\Resources\UserResource;
 use App\Jobs\ProcessEmail;
 use App\Mail\VerifyEmail;
 use App\Mail\WelcomeEmail;
@@ -46,7 +47,8 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User successfully created. Please check your email to verify your account.',
-            ...$tokenData
+            ...$tokenData,
+            'user' => new UserResource($user),
         ], 201);
     }
 
@@ -76,7 +78,10 @@ class AuthController extends Controller
             }
 
             $tokenData = $this->authService->login($request->only(['email', 'password']));
-            return response()->json($tokenData);
+            return response()->json([
+                ...$tokenData,
+                'user' => new UserResource($user),
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Invalid credentials'
@@ -93,7 +98,7 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         $user = $this->authService->user();
-        return response()->json(['user' => $user]);
+        return response()->json(['user' => new UserResource($user)]);
     }
 
     public function validateToken(Request $request)
@@ -106,6 +111,6 @@ class AuthController extends Controller
             return response()->json(['valid' => false], 401);
         }
 
-        return response()->json(['valid' => true, 'user' => $user]);
+        return response()->json(['valid' => true, 'user' => new UserResource($user)]);
     }
 }

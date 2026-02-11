@@ -59,7 +59,10 @@ class AuthJwtTest extends TestCase
                     'id',
                     'name',
                     'email',
-                    'role'
+                    'email_verified',
+                    'role',
+                    'created_at',
+                    'updated_at'
                 ]
             ])
             ->assertJson([
@@ -68,6 +71,7 @@ class AuthJwtTest extends TestCase
                 'user' => [
                     'name' => 'John Doe',
                     'email' => 'john@example.com',
+                    'email_verified' => false,
                 ]
             ]);
 
@@ -151,13 +155,17 @@ class AuthJwtTest extends TestCase
                     'id',
                     'name',
                     'email',
-                    'role'
+                    'email_verified',
+                    'role',
+                    'created_at',
+                    'updated_at'
                 ]
             ])
             ->assertJson([
                 'token_type' => 'Bearer',
                 'user' => [
                     'email' => 'john@example.com',
+                    'email_verified' => true, // Assuming user factory creates verified users if needed, or I should mark it.
                 ]
             ]);
     }
@@ -204,6 +212,7 @@ class AuthJwtTest extends TestCase
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'email_verified' => $user->hasVerifiedEmail(),
                 ]
             ]);
     }
@@ -252,6 +261,7 @@ class AuthJwtTest extends TestCase
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'email_verified' => $user->hasVerifiedEmail(),
                 ]
             ]);
     }
