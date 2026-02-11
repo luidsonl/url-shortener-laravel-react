@@ -151,8 +151,8 @@ class ShortLinkTest extends TestCase
                     '*' => [
                         'id',
                         'original_url',
-                        'code',
-                        'clicks',
+                        'short_code',
+                        'visits_count',
                         'expires_at',
                         'created_at',
                         'updated_at'
@@ -187,20 +187,16 @@ class ShortLinkTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonStructure([
                 'message',
-                'data' => [
-                    'id',
-                    'original_url',
-                    'code',
-                    'clicks',
-                    'expires_at'
-                ]
+                'id',
+                'original_url',
+                'short_code',
+                'visits_count',
+                'expires_at'
             ])
             ->assertJson([
                 'message' => 'Short link created',
-                'data' => [
-                    'original_url' => 'https://example.com/test',
-                    'clicks' => 0
-                ]
+                'original_url' => 'https://example.com/test',
+                'visits_count' => 0
             ]);
 
         $this->assertDatabaseHas('short_links', [
@@ -232,12 +228,10 @@ class ShortLinkTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [
-                    'id' => $shortLink->id,
-                    'original_url' => 'https://example.com/test',
-                    'code' => 'abc123',
-                    'clicks' => 0
-                ]
+                'id' => $shortLink->id,
+                'original_url' => 'https://example.com/test',
+                'short_code' => 'abc123',
+                'visits_count' => 0
             ]);
     }
 
@@ -287,10 +281,8 @@ class ShortLinkTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'message' => 'Short link updated',
-                'data' => [
-                    'id' => $shortLink->id,
-                    'original_url' => 'https://new.com'
-                ]
+                'id' => $shortLink->id,
+                'original_url' => 'https://new.com'
             ]);
 
         $this->assertDatabaseHas('short_links', [

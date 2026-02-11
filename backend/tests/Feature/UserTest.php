@@ -109,12 +109,10 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [
-                    'id' => $user->id,
-                    'name' => 'Test User',
-                    'email' => 'test@example.com',
-                    'role' => 'user'
-                ]
+                'id' => $user->id,
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'role' => 'user'
             ]);
     }
 
@@ -163,12 +161,10 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [
-                    'id' => $user->id,
-                    'name' => 'Updated Name',
-                    'email' => 'updated@example.com',
-                    'role' => 'user'
-                ]
+                'id' => $user->id,
+                'name' => 'Updated Name',
+                'email' => 'updated@example.com',
+                'role' => 'user'
             ]);
 
         $this->assertDatabaseHas('users', [
@@ -200,10 +196,8 @@ class UserTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [
-                    'id' => $user->id,
-                    'role' => 'admin'
-                ]
+                'id' => $user->id,
+                'role' => 'admin'
             ]);
 
         $this->assertDatabaseHas('users', [
@@ -464,19 +458,15 @@ class UserTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'data' => [
-                    'id',
-                    'name',
-                    'email',
-                    'role'
-                ]
+                'id',
+                'name',
+                'email',
+                'role'
             ])
             ->assertJson([
-                'data' => [
-                    'name' => 'New User',
-                    'email' => 'newuser@example.com',
-                    'role' => 'user'
-                ]
+                'name' => 'New User',
+                'email' => 'newuser@example.com',
+                'role' => 'user'
             ]);
 
         $this->assertDatabaseHas('users', [

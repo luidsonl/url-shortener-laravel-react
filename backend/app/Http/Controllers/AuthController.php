@@ -48,7 +48,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'User successfully created. Please check your email to verify your account.',
             ...$tokenData,
-            'user' => new UserResource($user),
+            'user' => (new UserResource($user))->resolve(),
         ], 201);
     }
 
@@ -80,7 +80,7 @@ class AuthController extends Controller
             $tokenData = $this->authService->login($request->only(['email', 'password']));
             return response()->json([
                 ...$tokenData,
-                'user' => new UserResource($user),
+                'user' => (new UserResource($user))->resolve(),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -98,7 +98,7 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         $user = $this->authService->user();
-        return response()->json(['user' => new UserResource($user)]);
+        return response()->json(['user' => (new UserResource($user))->resolve()]);
     }
 
     public function validateToken(Request $request)
@@ -111,6 +111,6 @@ class AuthController extends Controller
             return response()->json(['valid' => false], 401);
         }
 
-        return response()->json(['valid' => true, 'user' => new UserResource($user)]);
+        return response()->json(['valid' => true, 'user' => (new UserResource($user))->resolve()]);
     }
 }

@@ -49,7 +49,7 @@ class ShortLinkController extends Controller
 
         return response()->json([
             'message' => 'Short link created',
-            'data' => new ShortLinkResource($shortLink)
+            ...(new ShortLinkResource($shortLink))->resolve()
         ], 201);
     }
 
@@ -91,7 +91,7 @@ class ShortLinkController extends Controller
 
         return response()->json([
             'message' => 'Short link updated',
-            'data' => new ShortLinkResource($shortLink)
+            ...(new ShortLinkResource($shortLink))->resolve()
         ]);
     }
 

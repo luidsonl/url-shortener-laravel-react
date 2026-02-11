@@ -283,9 +283,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data: { $ref: '#/components/schemas/User' }
+                $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/Unauthorized'
     put:
@@ -310,10 +308,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message: { type: string, example: "User updated" }
-                  data: { $ref: '#/components/schemas/User' }
+                allOf:
+                  - type: object
+                    properties:
+                      message: { type: string, example: "User updated" }
+                  - $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -384,10 +383,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message: { type: string, example: "Short link created" }
-                  data: { $ref: '#/components/schemas/ShortLink' }
+                allOf:
+                  - type: object
+                    properties:
+                      message: { type: string, example: "Short link created" }
+                  - $ref: '#/components/schemas/ShortLink'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -440,10 +440,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message: { type: string, example: "Short link updated" }
-                  data: { $ref: '#/components/schemas/ShortLink' }
+                allOf:
+                  - type: object
+                    properties:
+                      message: { type: string, example: "Short link updated" }
+                  - $ref: '#/components/schemas/ShortLink'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -660,9 +661,9 @@ components:
       properties:
         id: { type: integer, example: 123 }
         original_url: { type: string, format: url, example: "https://google.com" }
-        code: { type: string, example: "abc123" }
-        short_url_attribute: { type: string, example: "http://localhost:8000/abc123" }
-        clicks: { type: integer, example: 5 }
+        short_code: { type: string, example: "abc123" }
+        short_url: { type: string, example: "http://localhost:8000/abc123" }
+        visits_count: { type: integer, example: 5 }
         expires_at: { type: string, format: date-time, nullable: true, example: "2026-12-31T23:59:59Z" }
         is_expired: { type: boolean, example: false }
         is_valid: { type: boolean, example: true }

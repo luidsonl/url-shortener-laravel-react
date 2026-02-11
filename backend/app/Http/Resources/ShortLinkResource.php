@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ShortLinkResource extends JsonResource
 {
+    public static $wrap = null;
+
     /**
      * Transform the resource into an array.
      *
@@ -17,9 +19,9 @@ class ShortLinkResource extends JsonResource
         return [
             'id'=> $this->id,
             'original_url' => $this->original_url,
-            'code' => $this->code,
-            'short_url_attribute' => $this->getShortUrlAttribute(),
-            'clicks' => $this->clicks,
+            'short_code' => $this->code,
+            'short_url' => $this->getShortUrlAttribute(),
+            'visits_count' => $this->clicks,
             'expires_at' => $this->expires_at,
             'is_expired' => $this->isExpired(),
             'is_valid' => $this->isValid(),

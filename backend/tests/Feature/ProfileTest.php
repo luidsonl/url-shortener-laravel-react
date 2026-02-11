@@ -40,10 +40,8 @@ class ProfileTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                ]
+                'id' => $user->id,
+                'email' => $user->email,
             ]);
     }
 
@@ -93,11 +91,9 @@ class ProfileTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [
-                    'id' => $user->id,
-                    'name' => 'Updated Name',
-                    'email' => 'user@example.com'
-                ]
+                'id' => $user->id,
+                'name' => 'Updated Name',
+                'email' => 'user@example.com'
             ]);
 
         $this->assertDatabaseHas('users', [
@@ -123,10 +119,8 @@ class ProfileTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                ]
+                'id' => $user->id,
+                'email' => $user->email,
             ]);
 
     }

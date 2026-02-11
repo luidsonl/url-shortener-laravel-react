@@ -58,8 +58,8 @@ class UserController extends Controller
         ProcessEmail::dispatch($user, $welcomeEmail);
 
         return response()->json([
-            'message' => 'Short link created',
-            'data' => new UserResource($user)
+            'message' => 'User created successfully',
+            ...(new UserResource($user))->resolve()
         ], 201);
     }
 
@@ -116,7 +116,7 @@ class UserController extends Controller
         
         return response()->json([
             'message' => 'User updated',
-            'data' => new UserResource($user)
+            ...(new UserResource($user))->resolve()
         ]);
     }
 

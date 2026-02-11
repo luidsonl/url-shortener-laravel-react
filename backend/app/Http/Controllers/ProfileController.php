@@ -15,7 +15,7 @@ class ProfileController extends Controller
         /** @var \App\Models\User|null $user */
         $user = auth()->guard()->user();
 
-        return new UserResource($user);
+        return response()->json((new UserResource($user))->resolve());
     }
 
     public function update(Request $request)
@@ -44,7 +44,7 @@ class ProfileController extends Controller
         
         return response()->json([
             'message' => 'User updated',
-            'data' => new UserResource($user)
+            ...(new UserResource($user))->resolve()
         ]);
     }
 
