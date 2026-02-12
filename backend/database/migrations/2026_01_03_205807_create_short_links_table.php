@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('original_url');
-            if (DB::connection()->getDriverName() !== 'sqlite') {
+            if (DB::connection()->getDriverName() === 'mysql') {
                 $table->string('code', 8)->collation('utf8mb4_bin')->unique()->nullable();
             } else {
                 $table->string('code', 8)->unique()->nullable();
